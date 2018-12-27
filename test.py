@@ -4,12 +4,17 @@ import pytesseract
 from PIL import Image
 import frame
 import subtitle
+import os
 
 videoFile = "video.mp4"
+imagesFolder = './frames/{}/'.format(videoFile)
 subtitles = subtitle.prepareSubtitle(videoFile)
 cap = cv2.VideoCapture(videoFile)
 frameRate = frame.getFrameRate(videoFile)
 count = 1
+
+if not os.path.exists(imagesFolder):
+    os.makedirs(imagesFolder)
 
 cap.set(cv2.CAP_PROP_POS_AVI_RATIO, 1)
 totalSeconds = cap.get(cv2.CAP_PROP_POS_MSEC)/1000 - 1
@@ -29,6 +34,8 @@ while(cap.isOpened()):
     if (frameId % math.floor(frameRate) == 0):
         subtitleArea = frame.getSubtitleArea(fr)
         if (not frame.isBlack(subtitleArea)):
+            filename = imagesFolder + "/second_" + str(count) + ".jpg"
+            cv2.imwrite(filename, subtitleArea)
             text = subtitle.getText(subtitleArea)
             timestamp = subtitle.getTimeStamp(sec)
             subtitles[sec] = subtitle.getSubtitleGroup(count, timestamp, text)

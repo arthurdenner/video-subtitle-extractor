@@ -1,0 +1,3 @@
+frames
+*.py
+__pycache__/*
